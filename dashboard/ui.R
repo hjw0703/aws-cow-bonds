@@ -1,6 +1,5 @@
 library(shinymanager)
 
-# Header
 header <- dashboardHeader(
   title = tags$a(
     href = "https://awp.landfood.ubc.ca/",
@@ -10,14 +9,13 @@ header <- dashboardHeader(
   dropdownMenuOutput("github")
 )
 
-# Side bar
 sidebar <- dashboardSidebar(
   sidebarMenu(
     id = "sidemenu",
     menuItem(HTML(paste("&nbsp; Relationships")), icon = icon("connectdevelop"), tabName = "relationships"),
     menuItem("Behaviour Patterns", icon = icon("chart-line"), tabName = "activities"),
     menuItem("Daily Behaviour", icon = icon("calendar"), tabName = "daily_behavior"),
-    # menuItem("Bins", icon = icon("chart-bar"), tabName = "bins"),
+   # menuItem("Bins", icon = icon("chart-bar"), tabName = "bins"),
     menuItem("Warnings", icon = icon("exclamation-triangle"), tabName = "warnings"),
     menuItem("FAQ", icon = icon("question-circle"), tabName = "FAQ")
   )
@@ -44,11 +42,7 @@ activities_tab <- tabItem(
         )
       ),
       column(4, date_range_widget("behaviour_date_range")),
-      column(4, cow_selection_widget("behaviour_cow_selection", label = p(
-        "Cows",
-        tags$style(type = "text/css", "#button_Cows_info2{border-radius: 0px;border-width: 0px}"),
-        bsButton("button_Cows_info2", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
-      ))),
+      column(4, cow_selection_widget("behaviour_cow_selection")),
       bsPopover(
         id = "button_behaviour", title = "Behaviour Patterns Tab",
         content = paste("This tab shows six behaviour patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
@@ -57,18 +51,6 @@ activities_tab <- tabItem(
           "<u>Aggregate</u> - aggregates the data on the daily, or monthly level.",
           "<u>Date Range</u> - timeline for the plots.",
           "<u>Cows</u> - cow(s) to showcase in the plots.",
-          sep = "<br>"
-        ),
-        placement = "right",
-        trigger = "hover",
-        options = list(container = "body")
-      ),
-      bsPopover(
-        id = "button_Cows_info2", title = "Cows",
-        content = paste("Multiple cows may be selected for these plots, to a max of 60 cows.",
-          "",
-          "<b>Select All:</b> selects all cows available for the date range.",
-          "<b>Deselect All:</b> deselects all cows available for the date range.",
           sep = "<br>"
         ),
         placement = "right",
@@ -103,12 +85,8 @@ daily_tab <- tabItem(
       ),
       width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
       column(4, date_widget("daily_date")),
-      column(4, cow_selection_widget("daily_cow_selection", label = p(
-        "Cows",
-        tags$style(type = "text/css", "#button_Cows_info1{border-radius: 0px;border-width: 0px}"),
-        bsButton("button_Cows_info1", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
-      ))),
-      column(4, h5(br(), "Please select a valid date and cow(s) to generate the plot below.")),
+      column(4, cow_selection_widget("daily_cow_selection")),
+      column(4, h5(br(), "Please select a valid date and cow(s) to generate the plots below")),
       bsPopover(
         id = "button_daily", title = "Daily Behaviour Tab",
         content = paste("This tab depicts the feeding, lying, standing, and drinking behaviours of selected cows.",
@@ -116,18 +94,6 @@ daily_tab <- tabItem(
           "<b>Customizations:</b>",
           "<u>Date</u> - the date for the plots to showcase.",
           "<u>Cows</u> - the cow(s) to showcase in the plots.",
-          sep = "<br>"
-        ),
-        placement = "right",
-        trigger = "hover",
-        options = list(container = "body")
-      ),
-      bsPopover(
-        id = "button_Cows_info1", title = "Cows",
-        content = paste("Multiple cows may be selected for this plot.",
-          "",
-          "<b>Select All:</b> selects all cows available for the date range.",
-          "<b>Deselect All:</b> deselects all cows available for the date range.",
           sep = "<br>"
         ),
         placement = "right",
@@ -215,20 +181,6 @@ relationships_tab <- tabItem(
         column(4, sliderInput("paired_cd_range", "Competition Density", min = 0, max = 1, value = c(0.2, 0.5), step = 0.1))
       ),
       bsPopover(
-        id = "button_network_info", title = "Network Decriptions",
-        content = paste(
-          "<b>Neighbours</b> - Cows who feed and drink directly beside each other.",
-          "<b>Synchronicity</b> - Split into two networks, this showcases networks of cows who stand and lie at the same time.",
-          "<b>Displacement</b> - Displacement is an instance of a cow replacing another cow at the same feeder within a time frame of 23 seconds or less. This network showcases that type of interaction between cows.",
-          "<b>Displacement Star*</b> - An indiviual cows displacement interactions.",
-          "<b>Displacement Paired</b> - A pair of cows displacement interactions.",
-          sep = "<br>"
-        ),
-        placement = "right",
-        trigger = "hover",
-        options = list(container = "body")
-      ),
-      bsPopover(
         id = "button_global_network", title = "Global Network Customizations",
         content = paste(
           "<b>Customizations:</b>",
@@ -263,10 +215,9 @@ relationships_tab <- tabItem(
   fluidRow(
     conditionalPanel(
       condition = "input.relationship_network_selection == 'Neighbour'",
-      default_tabBox("Feeding Neighbours", "neighbour",
-        width = 12,
-        output_fun = visNetworkOutput
-      )
+      report_tabBox("Feeding Neighbours", "neighbour", 
+                     width = 12, 
+                     output_fun = visNetworkOutput)
     )
   ),
   fluidRow(
@@ -284,35 +235,21 @@ relationships_tab <- tabItem(
   ),
   fluidRow(
     conditionalPanel(
-      condition = "input.relationship_network_selection == 'Displacement' || input.relationship_network_selection == 'Displacement Star*' || input.relationship_network_selection == 'Displacement Paired'",
+      condition = "input.relationship_network_selection == 'Displacement'",
+      default_tabBox("Social Network", "network_disp",
+        width = 12,
+        output_fun = visNetworkOutput
+      )
+    )
+  ),
+  fluidRow(
+    conditionalPanel(
+      condition = "input.relationship_network_selection == 'Displacement Star*' || input.relationship_network_selection == 'Displacement Paired'",
       default_tabBox("Social Network", "network",
         width = 6,
         output_fun = visNetworkOutput
       ),
-      default_tabBox(
-        title = p(
-          "Dominance",
-          tags$style(type = "text/css", "#button_Dominance_plot{border-radius: 0px;border-width: 0px}"),
-          bsButton("button_Dominance_plot",
-            label = "", icon = icon("info-circle", lib = "font-awesome"),
-            size = "extra-small"
-          )
-        ),
-        "elo",
-        width = 6,
-        popover = bsPopover(
-          id = "button_Dominance_plot", title = "Dominance",
-          content =
-            paste("The plot shown for the full Displacement network, (most and least dominant cows), is calculated as the cows with the maximum and minimum average elo for the selected period.",
-              "",
-              "The most dominant cows are shown in red, and the least dominant in blue.",
-              sep = "<br>"
-            ),
-          placement = "right",
-          trigger = "hover",
-          options = list(container = "body")
-        )
-      )
+      default_tabBox("Dominance", "elo", width = 6)
     )
   ),
   fluidRow(
@@ -327,33 +264,96 @@ relationships_tab <- tabItem(
     default_tabBox(
       title = p(
         "THI",
-        tags$style(type = "text/css", "#button_THI_plot{border-radius: 0px;border-width: 0px}"),
-        bsButton("button_THI_plot",
-          label = "", icon = icon("info-circle", lib = "font-awesome"),
-          size = "extra-small"
-        )
-      ),
-      "THI",
-      width = 12,
-      popover = bsPopover(
-        id = "button_THI_plot", title = "THI",
-        content =
-          paste("THI stands for Temperature Humidity Index and is calculated as:",
+      tags$style(type = "text/css", "#button_THI_plot{border-radius: 0px;border-width: 0px}"),
+      bsButton("button_THI_plot",
+               label = "", icon = icon("info-circle", lib = "font-awesome"),
+               size = "extra-small"
+      )
+    ), 
+    "THI",
+    width = 12,
+    popover = bsPopover(
+      id = "button_THI_plot", title = "THI",
+      content = 
+      paste("THI stands for Temperature Humidity Index and is calculated as:",
             "",
             "<i>THI = 0.8*Temperature + Relative Humidity Index * (Temperature - 14.4) + 46.4 </i>",
             "",
             "THI is an important measure for dairy farms, as dairy cows are very susceptible to heat stress.",
             "",
             "The threshold for heat stress is THI = 68, pictured as the grey dashed line in the plot below.",
-            sep = "<br>"
-          ),
-        placement = "right",
-        trigger = "hover",
-        options = list(container = "body")
-      )
-    )
-  )
+            sep = "<br>"),
+      placement = "right",
+      trigger = "hover",
+      options = list(container = "body"))
 )
+)
+)
+
+# Bins tab
+# bins_tab <- tabItem(
+#   "bins",
+#   fluidRow(
+#     box(
+#       title = p(
+#         "Customizations",
+#         tags$style(type = "text/css", "#button_bins{border-radius: 0px;border-width: 0px}"),
+#         bsButton("button_bins", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
+#       ),
+#       width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+#       fluidRow(
+#         column(4, date_widget("bin_date"), ),
+#         column(8, bin_selection_widget("behaviour_bin_selection")),
+#         bsPopover(
+#           id = "button_bins", title = "Bins Tab",
+#           content = paste("This tab shows weight status and interaction information for the feedbins.",
+#             "",
+#             "<b>Customizations:</b>",
+#             "<u>Date</u> - the date for the plots to showcase.",
+#             "<u>Bins</u> - feed bin(s) to showcase in the hunger plot.",
+#             sep = "<br>"
+#           ),
+#           placement = "right",
+#           trigger = "hover",
+#           options = list(container = "body")
+#         )
+#       )
+#     )
+#   ),
+#   fluidRow(
+#     default_tabBox("Hunger Plot", "hunger", width = 12)
+#   ),
+#   fluidRow(
+#     box(
+#       title = p(
+#         "Customizations",
+#         tags$style(type = "text/css", "#button_other{border-radius: 0px;border-width: 0px}"),
+#         bsButton("button_other", label = "", icon = icon("info-circle", lib = "font-awesome"), size = "extra-small")
+#       ),
+#       width = 12, solidHeader = TRUE, status = "primary", collapsible = TRUE,
+#       fluidRow(
+#         column(8, sliderInput("obs_hr", "Hour", min = 0, max = 23, value = 12)),
+#         column(4, bin_wt_widget("bin_weight")),
+#         bsPopover(
+#           id = "button_other", title = "Behaviour Patterns Tab",
+#           content = paste("This tab shows six behaviour patterns over a given timeline. Charts are for the herd average, and selected cow(s).",
+#             "",
+#             "<b>Customizations:</b>",
+#             "<u>Hour</u> - hour of the selected date to observe in the plot",
+#             "<u>Full Bin Weight</u> - TBD",
+#             sep = "<br>"
+#           ),
+#           placement = "right",
+#           trigger = "hover",
+#           options = list(container = "body")
+#         )
+#       ),
+#     )
+#   ),
+#   fluidRow(
+#     default_tabBox("Hourly Feed Bin Data", "feed_bin", width = 12, output_fun = plotOutput)
+#   )
+# )
 
 # Warnings tab
 warnings_tab <- tabItem(
@@ -419,7 +419,7 @@ FAQ_tab <- tabItem(
   data_FAQ(),
   statistical_FAQ(),
   references_FAQ(),
-  downloadButton("downloadReferences")
+  downloadButton('downloadReferences')
 )
 
 # Dashboard body and combining tabs
@@ -441,24 +441,18 @@ body <- dashboardBody(
     activities_tab,
     daily_tab,
     relationships_tab,
-    # bins_tab,
+   # bins_tab,
     warnings_tab,
     FAQ_tab
   )
 )
 
-ui <- fluidPage(
-  setSliderColor(
-    c("#6b96c7", "#6b96c7", "#6b96c7", "#6b96c7"),
-    c(1, 2, 3, 4)
-  ),
-  dashboardPage(
-    title = "Dairy Cow Dashboard",
-    header,
-    sidebar,
-    body
-  )
-)
+ui <- fluidPage(setSliderColor(c("#6b96c7","#6b96c7","#6b96c7","#6b96c7"),
+                               c(1,2,3,4)),
+                dashboardPage(title="Dairy Cow Dashboard",
+                              header,
+                              sidebar,
+                              body))
 
 # Authentication page
 ui <- secure_app(ui,
@@ -501,7 +495,7 @@ ui <- secure_app(ui,
     border-color: #6b96c7;
 }")),
       tags$p(
-        "For any questions, please contact the ",
+        "For any questions, please contact ",
         tags$a(
           href = "mailto:animalwelfare@ubc.ca?Subject=Peek-a-Moo%20aDashboard%20aAccess",
           target = "_top", "administrator"
