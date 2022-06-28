@@ -43,7 +43,16 @@ A Bayesian framework for modelling social network data has been introduced (@har
 
 
 ```{r library packages, include=FALSE}
+library(rstan)
+library(tibble)
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(stats)
+library(graphics)
+library(ggplot2)
 rstan_options(auto_write = TRUE)  # To save some compiling
+options(mc.cores = parallel::detectCores())
 ```
 
 # Exploratory Data Analysis
@@ -115,8 +124,9 @@ Because the Bayesian analysis is impacted by the "correctness" of the prior, it 
 
 We use Markov Chain Monte Carlo(MCMC) with the parameters: chain = 1, iter = 8000, warmup = 2000, thin = 10 to simulate 600 samples.
 
-```{stan output.var='stan_model'}
+```{r stan model}
 
+count_model <- '
 data {
   int<lower=0> num_obs; // Number of observations
   int<lower=0> num_dyads; // Number of dyads
@@ -140,6 +150,7 @@ generated quantities {
   count_pred[i] = poisson_rng(exp(log_edge[dyad_ids[i]]));
   }
 }
+'
 
 ```
 
@@ -152,15 +163,16 @@ model_data <- list(
   count = df$weight # Vector of event counts corresponding to each observation,
 )
 
+cow_mod <- stan_model(model_code = count_model) 
+
 posterior_sampling <- rstan::sampling(
-  object = stan_model,
+  object = cow_mod,
   data = model_data,
-  chains = 2,
+  chains = 4,
   iter = 8000,
   warmup = 2000,
   thin = 10,
-  seed = 123,
-  cores = getOption("mc.cores", 2L)
+  seed = 123
 )
 
 

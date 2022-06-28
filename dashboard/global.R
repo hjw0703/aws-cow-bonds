@@ -210,7 +210,7 @@ report_tabBox <- function(title, var_name, width = 6, height = "500px", output_f
                  actionButton("render", "Render the statistical report")
                     )
                ),
-             htmlOutput("report"),
+             uiOutput("report"),
              downloadButton('downloadReport')),
     tabPanel("Data", shinycssloaders::withSpinner(
       image = "loading_cow_table.gif",
