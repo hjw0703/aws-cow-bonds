@@ -69,16 +69,16 @@ Postgres_dbname <- "cowbonds"
 Postgres_timezone <- "America/Los_Angeles"
 
 
-# con <-  dbConnect(RPostgres::Postgres(), 
-#                   user=Postgres_user, 
-#                   password=Postgres_password,
-#                   host=Postgres_host, 
-#                   port=5432, 
-#                   dbname=Postgres_dbname, 
-#                   timezone=Postgres_timezone)
+con <-  dbConnect(RPostgres::Postgres(),
+                  user=Postgres_user,
+                  password=Postgres_password,
+                  host=Postgres_host,
+                  port=5432,
+                  dbname=Postgres_dbname,
+                  timezone=Postgres_timezone)
 
-con <- dbConnect(RPostgres::Postgres(), user="postgres", password="777777",
-                 host="localhost", port=5432, dbname="postgres", timezone="America/Los_Angeles")
+# con <- dbConnect(RPostgres::Postgres(), user="postgres", password="777777",
+#                  host="localhost", port=5432, dbname="postgres", timezone="America/Los_Angeles")
 
 master_feed_replacement_all <- tbl(con,"master_feed_replacement_all") %>%
   as.data.frame()
