@@ -12,7 +12,6 @@ library(igraph)
 library(lubridate)
 library(png)
 library(visNetwork)
-library(googleCloudStorageR)
 library(reshape2)
 library(shinyBS)
 library(rmarkdown)
@@ -32,8 +31,6 @@ source("../R/behaviour.R")
 source("../R/daily_behavior.R")
 source("../R/network.R")
 source("../R/elo.R")
-# source("../R/bully_analysis.R")
-#source("../R/bins.R")
 source("../R/THI_analysis.R")
 source("../R/FAQ.R")
 
@@ -202,7 +199,7 @@ report_tabBox <- function(title, var_name, width = 6, height = "500px", output_f
     popover,
     tabPanel("Analysis", helpText("Select a cow of interest to generate a Bayesian analysis report on \"Feeding Neighbours\". Note: generating a report will take more than 4 minutes, as a Markov chain Monte Carlo simulation is running under the hood."),
              cow_selection_widget("analysis_cow_id", multiple = FALSE, label = "Cow of Interest"),
-             download_format_widget("analysis_format"),
+             # download_format_widget("analysis_format"),
              fluidRow(
                column(
                  12, 
